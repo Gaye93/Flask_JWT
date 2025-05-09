@@ -18,13 +18,18 @@ jwt = JWTManager(app)
 
 @app.route('/') 
 def hello_world():
-    return render_template('accueil.html')
+    return render_template('accueil.html')  # Page d'accueil avec lien vers le formulaire
 
-# Création d'une route qui vérifie l'utilisateur et retour un Jeton JWT si ok.
+# Route pour afficher le formulaire de connexion
+@app.route('/formulaire', methods=['GET'])
+def formulaire():
+    return render_template('formulaire.html')  # Affiche le formulaire HTML
+
+# Création d'une route qui vérifie l'utilisateur et retourne un jeton JWT si les informations sont correctes
 @app.route("/login", methods=["POST"])
 def login():
-    username = request.json.get("username", None)
-    password = request.json.get("password", None)
+    username = request.form.get("username")
+    password = request.form.get("password")
     
     # Vérification des utilisateurs
     if username == "admin" and password == "adminpass":
@@ -50,7 +55,6 @@ def user():
     identity = get_jwt_identity()
     if identity.get("role") != "user":
         return jsonify({"msg": "Accès refusé : vous n'êtes pas un utilisateur"}), 403
-
     return jsonify({"msg": f"Bienvenue utilisateur {identity['username']} !"}), 200
 
 # Route pour les administrateurs
@@ -60,7 +64,6 @@ def admin():
     identity = get_jwt_identity()
     if identity.get("role") != "admin":
         return jsonify({"msg": "Accès refusé : vous n'êtes pas administrateur"}), 403
-
     return jsonify({"msg": f"Bienvenue Admin {identity['username']} !"}), 200
 
 if __name__ == "__main__":
